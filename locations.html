@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Our Locations — Rashko Restaurant, Kano</title>
+  <meta name="description" content="Visit Rashko Restaurant at any of our three Kano branches: Gwarzo Road, Zoo Road, and Bompai.">
+  <meta property="og:title" content="Our Locations — Rashko Restaurant">
+  <meta property="og:description" content="Three Rashko branches across Kano. Find the one nearest you.">
+  <link rel="icon" type="image/png" href="assets/img/rashko-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div id="site-header-slot"></div>
+  <main>
+    <section class="section--page-hero">
+      <div class="container-narrow">
+        <span class="ornament eyebrow">Locations</span>
+        <h1 class="display-xl mt-6">Three Tables, One Welcome</h1>
+        <p>Find your nearest Rashko branch in Kano. Choose a location to personalize ordering, reservations, and contact details across the site.</p>
+      </div>
+    </section>
+
+    <section class="container-narrow">
+      <div class="locations-grid" id="locations-root"></div>
+    </section>
+  </main>
+  <div id="site-footer-slot"></div>
+  <div id="wa-float-slot"></div>
+  <script src="assets/js/site.js"></script>
+  <script>
+    function renderLocations() {
+      const active = RashkoBranches.getBranch();
+      const root = document.getElementById("locations-root");
+      root.innerHTML = RashkoBranches.BRANCHES.map(b => {
+        const isActive = b.id === active.id;
+        return `
+          <article class="location-card ${isActive ? "is-active" : ""}">
+            <div style="display:flex;justify-content:space-between;gap:0.75rem;align-items:flex-start;">
+              <div>
+                <span class="eyebrow" style="font-size:0.65rem;">Rashko</span>
+                <h2>${b.shortName}</h2>
+              </div>
+              ${isActive ? `<span class="selected-pill"><span class="icon-inline" style="width:0.75rem;height:0.75rem;" data-icon="check"></span>Selected</span>` : ""}
+            </div>
+            <ul class="location-card__list">
+              <li><span class="icon-inline" data-icon="pin"></span><div>${b.addressLines.map(l => `<div>${l}</div>`).join("")}</div></li>
+              <li><span class="icon-inline" data-icon="clock"></span><span>${b.hours}</span></li>
+              <li><span class="icon-inline" data-icon="phone"></span><a href="tel:${b.phoneDisplay.replace(/\s+/g,"")}" style="transition:color .15s;">${b.phoneDisplay}</a></li>
+            </ul>
+            <div class="location-card__actions">
+              <button type="button" class="btn btn--accent" data-select="${b.id}" ${isActive ? "disabled" : ""}>
+                ${isActive ? "Current Branch" : "Select Branch"}
+              </button>
+              <div class="location-card__sub-actions">
+                <a href="order.html" class="btn btn--outline" data-select-link="${b.id}" style="padding:0.625rem 1rem;font-size:0.65rem;letter-spacing:0.25em;">Order</a>
+                <a href="contact.html" class="btn btn--outline" data-select-link="${b.id}" style="padding:0.625rem 1rem;font-size:0.65rem;letter-spacing:0.25em;">Reserve</a>
+              </div>
+              <a href="https://www.google.com/maps/search/?api=1&query=${b.mapsQuery}" target="_blank" rel="noopener" class="location-card__maps">Open in Maps →</a>
+            </div>
+          </article>
+        `;
+      }).join("");
+      hydrateIcons(root);
+      root.querySelectorAll("[data-select]").forEach(btn => {
+        btn.addEventListener("click", () => RashkoBranches.setBranchId(btn.dataset.select));
+      });
+      root.querySelectorAll("[data-select-link]").forEach(a => {
+        a.addEventListener("click", () => RashkoBranches.setBranchId(a.dataset.selectLink));
+      });
+    }
+    document.addEventListener("DOMContentLoaded", renderLocations);
+    window.addEventListener("rashko:branch-change", renderLocations);
+  </script>
+</body>
+</html>

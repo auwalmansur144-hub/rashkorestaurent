@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reviews — Rashko Restaurant, Kano</title>
+  <meta name="description" content="What guests are saying about Rashko Restaurant in Kano. 4.8 stars on Google — read the full reviews.">
+  <meta property="og:title" content="Reviews — Rashko Restaurant">
+  <meta property="og:description" content="4.8★ on Google. Read what guests are saying about Rashko Restaurant.">
+  <link rel="icon" type="image/png" href="assets/img/rashko-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div id="site-header-slot"></div>
+  <main>
+    <section class="section--page-hero">
+      <div class="container-narrow">
+        <span class="ornament eyebrow">Guest Words</span>
+        <h1 class="display-xl mt-6">4.8 ★ on Google</h1>
+        <div class="stars" style="justify-content:center;margin-top:1.5rem;" id="hero-stars"></div>
+        <p style="margin-top:1rem;font-size:0.875rem;color:var(--muted-foreground);">From 12+ verified reviews</p>
+      </div>
+    </section>
+
+    <section class="container-narrow" style="padding-block:6rem;">
+      <div class="reviews-grid" id="reviews-root"></div>
+    </section>
+  </main>
+  <div id="site-footer-slot"></div>
+  <div id="wa-float-slot"></div>
+  <script src="assets/js/site.js"></script>
+  <script>
+    const REVIEWS = [
+      { name: "Adamchat", when: "2 months ago", rating: 5, text: "The best Restaurant in Kano. The food, the service, the atmosphere — all five stars. We will be back many times." },
+      { name: "Sely Noor", when: "2 months ago", rating: 5, text: "Very good restaurant. Beautifully presented food and incredibly attentive service. The lamb mandi melted in our mouths." },
+      { name: "محمد الحامد", when: "2 months ago", rating: 5, text: "Delicious and healthy Arabic food. Felt like a real home-cooked meal in Sana'a. The mezze plate alone is worth the visit." },
+      { name: "Aisha Bello", when: "3 months ago", rating: 5, text: "We hosted a family dinner here and the staff went above and beyond. The mansaf was extraordinary — generous portions, deep flavour." },
+      { name: "Yusuf Idris", when: "1 month ago", rating: 4, text: "Lovely room, very warm lighting, and the kunafa is dangerous. Will be back for the kabsa." },
+      { name: "Fatima A.", when: "5 weeks ago", rating: 5, text: "Authentic Arabic flavours done right. The hummus and warm pita kept arriving — we were spoiled." },
+    ];
+    document.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("hero-stars").innerHTML = Array(5).fill(ICONS.starFilled).join("");
+      const root = document.getElementById("reviews-root");
+      root.innerHTML = REVIEWS.map(r => `
+        <article class="review-card">
+          <div class="stars">${Array(r.rating).fill(ICONS.starFilled).join("")}</div>
+          <p class="review-card__quote">"${r.text}"</p>
+          <div class="review-card__meta"><span>${r.name}</span><span>${r.when}</span></div>
+        </article>
+      `).join("");
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reservations & Contact — Rashko Restaurant, Kano</title>
+  <meta name="description" content="Reserve a table at Rashko Restaurant, Kano. Open daily 11am – 11pm.">
+  <meta property="og:title" content="Reserve a Table — Rashko Restaurant">
+  <meta property="og:description" content="Reserve a table at Rashko Restaurant, Kano.">
+  <link rel="icon" type="image/png" href="assets/img/rashko-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div id="site-header-slot"></div>
+  <main>
+    <section class="section--page-hero">
+      <div class="container-narrow">
+        <span class="ornament eyebrow">Reserve</span>
+        <h1 class="display-xl mt-6">Join Us at the Table</h1>
+        <p>For parties of seven or more, please call ahead. We'll confirm your reservation within the hour.</p>
+        <div class="branch-pill">
+          <span class="icon-inline" style="width:0.875rem;height:0.875rem;" data-icon="pin"></span>
+          <span class="label">Reserving at</span>
+          <span class="name" data-branch-short>Gwarzo Road</span>
+          <span class="hint">— change in header</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="container-narrow contact-grid">
+      <div>
+        <div id="contact-form-wrap">
+          <form class="contact-form" id="reservation-form">
+            <div class="contact-row-2">
+              <div class="contact-field"><label class="eyebrow" style="display:block;margin-bottom:0.5rem;">Name</label><input type="text" name="name" required></div>
+              <div class="contact-field"><label class="eyebrow" style="display:block;margin-bottom:0.5rem;">Phone</label><input type="tel" name="phone" required></div>
+            </div>
+            <div class="contact-field"><label class="eyebrow" style="display:block;margin-bottom:0.5rem;">Email</label><input type="email" name="email" required></div>
+            <div class="contact-row-3">
+              <div class="contact-field"><label class="eyebrow" style="display:block;margin-bottom:0.5rem;">Date</label><input type="date" name="date" required></div>
+              <div class="contact-field"><label class="eyebrow" style="display:block;margin-bottom:0.5rem;">Time</label><input type="time" name="time" required></div>
+              <div class="contact-field"><label class="eyebrow" style="display:block;margin-bottom:0.5rem;">Guests</label><input type="number" name="guests" min="1" max="20" value="2" required></div>
+            </div>
+            <div class="contact-field">
+              <label class="eyebrow" style="display:block;margin-bottom:0.5rem;">Special requests</label>
+              <textarea name="notes" rows="4" placeholder="Allergies, occasion, seating preference…"></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary" style="margin-top:1rem;align-self:flex-start;">Request Reservation</button>
+          </form>
+        </div>
+      </div>
+
+      <aside class="contact-aside">
+        <div class="info-block">
+          <div class="head"><span class="icon-inline" data-icon="pin"></span><span class="eyebrow">Find Us</span></div>
+          <p data-branch-address></p>
+        </div>
+        <div class="info-block">
+          <div class="head"><span class="icon-inline" data-icon="clock"></span><span class="eyebrow">Hours</span></div>
+          <p><span data-branch-hours></span><br><span style="color:var(--muted-foreground);">Kitchen closes 22:30</span></p>
+        </div>
+        <div class="info-block">
+          <div class="head"><span class="icon-inline" data-icon="phone"></span><span class="eyebrow">Reservations</span></div>
+          <p>For parties of 7+, please call directly.<br>
+            <a data-branch-phone-link href="#" style="color:var(--accent);text-decoration:underline;"></a>
+          </p>
+        </div>
+        <div class="map-frame"><iframe data-branch-map title="Branch location" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      </aside>
+    </section>
+  </main>
+  <div id="site-footer-slot"></div>
+  <div id="wa-float-slot"></div>
+  <script src="assets/js/site.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("reservation-form");
+      form.addEventListener("submit", e => {
+        e.preventDefault();
+        document.getElementById("contact-form-wrap").innerHTML = `
+          <div class="success-box">
+            <p class="italic-script" style="font-size:1.875rem;">Shukran!</p>
+            <p style="margin-top:1rem;color:rgba(26,26,26,0.75);">Your request has been sent. We'll be in touch shortly to confirm.</p>
+          </div>
+        `;
+      });
+    });
+  </script>
+</body>
+</html>

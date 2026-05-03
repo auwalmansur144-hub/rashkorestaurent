@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Order Online — Rashko Restaurant, Kano</title>
+  <meta name="description" content="Build your order from Rashko's full menu and send it straight to our kitchen via WhatsApp.">
+  <meta property="og:title" content="Order Online — Rashko Restaurant">
+  <meta property="og:description" content="Pick your dishes, choose delivery or pickup, send via WhatsApp.">
+  <link rel="icon" type="image/png" href="assets/img/rashko-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div id="site-header-slot"></div>
+  <main>
+    <section class="section--page-hero" style="padding-block:5rem;">
+      <div class="container-narrow">
+        <span class="ornament eyebrow">Order Online</span>
+        <h1 class="display-xl mt-6">Build Your Order</h1>
+        <p>Choose your dishes, tell us where to send them. We'll confirm everything by WhatsApp before we begin cooking.</p>
+        <div class="branch-pill">
+          <span class="icon-inline" style="width:0.875rem;height:0.875rem;" data-icon="pin"></span>
+          <span class="label">Ordering from</span>
+          <span class="name" data-branch-short>Gwarzo Road</span>
+          <span class="hint">— change in header</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="container-narrow order-grid">
+      <div id="menu-list"></div>
+
+      <aside class="cart">
+        <div>
+          <p class="eyebrow">Your Order</p>
+          <h2 class="display-lg" style="font-size:1.5rem;margin-top:0.25rem;" id="cart-title">Empty</h2>
+        </div>
+        <ul class="cart__lines" id="cart-lines"></ul>
+        <p class="cart__empty" id="cart-empty" style="font-size:0.875rem;color:rgba(26,26,26,0.6);">Add dishes from the menu to start your order.</p>
+        <div class="cart__total">
+          <span class="eyebrow">Total</span>
+          <span id="cart-total">₦0</span>
+        </div>
+
+        <form id="order-form" class="contact-form" style="gap:1rem;">
+          <div class="mode-toggle">
+            <button type="button" data-mode="delivery" class="is-active">Delivery</button>
+            <button type="button" data-mode="pickup">Pickup</button>
+          </div>
+
+          <label class="field"><span>Your name</span><input type="text" name="name" maxlength="80" class="form-input" placeholder="Full name"></label>
+          <label class="field"><span>Phone (WhatsApp)</span><input type="tel" name="phone" maxlength="20" class="form-input" placeholder="+234 …"></label>
+          <label class="field" id="address-field"><span>Delivery address</span><textarea name="address" maxlength="200" rows="2" class="form-input" placeholder="Street, area, landmark"></textarea></label>
+          <label class="field"><span>Notes (optional)</span><textarea name="notes" maxlength="300" rows="2" class="form-input" placeholder="Allergies, spice level, etc."></textarea></label>
+
+          <ul class="errors" id="order-errors"></ul>
+
+          <button type="submit" class="send-btn" id="send-btn" disabled>
+            <span class="icon-inline" style="width:1rem;height:1rem;" data-icon="whatsapp"></span>
+            Send Order via WhatsApp
+          </button>
+          <p class="send-note">You'll be taken to WhatsApp with your order pre-filled. We'll confirm price &amp; ETA before cooking.</p>
+        </form>
+      </aside>
+    </div>
+  </main>
+  <div id="site-footer-slot"></div>
+  <div id="wa-float-slot"></div>
+  <script src="assets/js/site.js"></script>
+  <script>
+    let cart = {}; // { dishName: qty }
+    let mode = "delivery";
+
+    function getDish(name) {
+      for (const s of RashkoMenu) for (const d of s.items) if (d.name === name) return d;
+      return null;
+    }
+    function lines() {
+      return Object.entries(cart).filter(([,q]) => q > 0).map(([name, qty]) => {
+        const d = getDish(name);
+        return { dish: d, qty, subtotal: d.priceValue * qty };
+      });
+    }
+
+    function renderMenu() {
+      const root = document.getElementById("menu-list");
+      root.innerHTML = RashkoMenu.map(section => `
+        <section class="menu-section">
+          <header style="margin-bottom:2rem;">
+            <p class="eyebrow">${section.subtitle}</p>
+            <h2 class="display-lg" style="margin-top:0.5rem;">${section.title}</h2>
+          </header>
+          <div class="order-list">
+            ${section.items.map(d => `
+              <article class="order-row" data-dish="${d.name}">
+                <div class="order-row__main">
+                  <div class="order-row__head">
+                    <h3>${d.name}</h3>
+                    <span class="order-row__price">${d.price}</span>
+                  </div>
+                  <p class="order-row__desc">${d.desc}</p>
+                </div>
+                <div class="qty-stepper" data-stepper="${d.name}"></div>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+      `).join("");
+      renderSteppers();
+    }
+
+    function renderSteppers() {
+      document.querySelectorAll("[data-stepper]").forEach(el => {
+        const name = el.dataset.stepper;
+        const qty = cart[name] || 0;
+        if (qty > 0) {
+          el.innerHTML = `
+            <button type="button" class="icon-btn" data-act="dec">${ICONS.minus}</button>
+            <span class="qty-stepper__value">${qty}</span>
+            <button type="button" class="icon-btn" data-act="inc">${ICONS.plus}</button>
+          `;
+          el.querySelector('[data-act="dec"]').addEventListener("click", () => setQty(name, -1));
+          el.querySelector('[data-act="inc"]').addEventListener("click", () => setQty(name, 1));
+        } else {
+          el.innerHTML = `<button type="button" class="qty-add">Add</button>`;
+          el.querySelector("button").addEventListener("click", () => setQty(name, 1));
+        }
+      });
+    }
+
+    function setQty(name, delta) {
+      cart[name] = Math.max(0, (cart[name] || 0) + delta);
+      if (cart[name] === 0) delete cart[name];
+      renderSteppers();
+      renderCart();
+    }
+
+    function renderCart() {
+      const ls = lines();
+      const total = ls.reduce((s, l) => s + l.subtotal, 0);
+      const count = ls.reduce((s, l) => s + l.qty, 0);
+      document.getElementById("cart-title").textContent = count === 0 ? "Empty" : `${count} item${count > 1 ? "s" : ""}`;
+      document.getElementById("cart-total").textContent = formatNaira(total);
+      document.getElementById("cart-empty").style.display = ls.length ? "none" : "block";
+      const list = document.getElementById("cart-lines");
+      list.innerHTML = ls.map(l => `
+        <li class="cart__line">
+          <span class="cart__qty">${l.qty}×</span>
+          <div class="cart__name-wrap" style="flex:1;min-width:0;">
+            <p class="cart__name">${l.dish.name}</p>
+            <p class="cart__sub">${formatNaira(l.subtotal)}</p>
+          </div>
+          <button type="button" class="cart__remove" data-remove="${l.dish.name}" aria-label="Remove ${l.dish.name}">${ICONS.trash}</button>
+        </li>
+      `).join("");
+      list.querySelectorAll("[data-remove]").forEach(b => b.addEventListener("click", () => {
+        delete cart[b.dataset.remove]; renderSteppers(); renderCart();
+      }));
+      document.getElementById("send-btn").disabled = ls.length === 0;
+    }
+
+    function buildMessage(branch) {
+      const ls = lines();
+      const total = ls.reduce((s,l) => s + l.subtotal, 0);
+      const f = new FormData(document.getElementById("order-form"));
+      const lns = [];
+      lns.push(`*New Order — Rashko (${branch.shortName})*`, "");
+      lns.push(`*Branch:* ${branch.name}`);
+      lns.push(`*Name:* ${(f.get("name")||"").trim()}`);
+      lns.push(`*Phone:* ${(f.get("phone")||"").trim()}`);
+      lns.push(`*Type:* ${mode === "delivery" ? "Delivery" : `Pickup at ${branch.shortName}`}`);
+      if (mode === "delivery") lns.push(`*Address:* ${(f.get("address")||"").trim()}`);
+      const notes = (f.get("notes")||"").trim();
+      if (notes) lns.push(`*Notes:* ${notes}`);
+      lns.push("", "*Items:*");
+      ls.forEach(l => lns.push(`• ${l.qty} × ${l.dish.name} — ${formatNaira(l.subtotal)}`));
+      lns.push("", `*Total:* ${formatNaira(total)}`);
+      return lns.join("\n");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderMenu();
+      renderCart();
+
+      // Mode toggle
+      document.querySelectorAll("[data-mode]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          mode = btn.dataset.mode;
+          document.querySelectorAll("[data-mode]").forEach(b => b.classList.toggle("is-active", b.dataset.mode === mode));
+          document.getElementById("address-field").style.display = mode === "delivery" ? "" : "none";
+        });
+      });
+
+      document.getElementById("order-form").addEventListener("submit", e => {
+        e.preventDefault();
+        const branch = RashkoBranches.getBranch();
+        const ls = lines();
+        const f = new FormData(e.target);
+        const errors = [];
+        if (ls.length === 0) errors.push("Please add at least one dish to your order.");
+        if (((f.get("name")||"").trim()).length < 2) errors.push("Please enter your name.");
+        if (!/^[0-9+\s()-]{7,20}$/.test((f.get("phone")||"").trim())) errors.push("Please enter a valid phone number.");
+        if (mode === "delivery" && ((f.get("address")||"").trim()).length < 6) errors.push("Please enter a delivery address in Kano.");
+        document.getElementById("order-errors").innerHTML = errors.map(er => `<li>• ${er}</li>`).join("");
+        if (errors.length) return;
+        window.open(whatsappUrl(branch.whatsapp, buildMessage(branch)), "_blank", "noopener,noreferrer");
+      });
+    });
+  </script>
+</body>
+</html>
